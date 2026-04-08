@@ -306,26 +306,33 @@ nav {{
 
 /* ── Layout ── */
 .wrap {{
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 32px 28px 80px;
+  padding: 20px 28px 60px;
 }}
 
-/* ── Metrics ── */
+/* ── Top Row ── */
+.top-row {{
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  margin-bottom: 20px;
+}}
+
 .metrics {{
   display: flex;
   gap: 1px;
   background: var(--border);
   border-radius: var(--radius);
   overflow: hidden;
-  margin-bottom: 32px;
+  flex-shrink: 0;
 }}
 
 .metric {{
-  flex: 1;
   background: var(--surface);
-  padding: 20px 24px;
+  padding: 14px 22px;
   text-align: center;
+  min-width: 100px;
 }}
 
 .metric:first-child {{ border-radius: var(--radius) 0 0 var(--radius); }}
@@ -333,7 +340,7 @@ nav {{
 
 .metric-val {{
   font-family: var(--mono);
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 300;
   color: var(--text-primary);
   letter-spacing: -1px;
@@ -341,26 +348,47 @@ nav {{
 
 .metric-label {{
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 400;
   color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  margin-top: 8px;
+  margin-top: 4px;
 }}
+
+.pipeline-inline {{
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}}
+
+.pipe-label {{
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}}
+
+/* ── Main Layout 2-col ── */
+.layout {{
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+  align-items: start;
+}}
+
+.col-main {{ min-width: 0; }}
+.col-side {{ min-width: 0; }}
 
 /* ── Query ── */
-.query-section {{ margin-bottom: 32px; }}
-
-.query-label {{
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 400;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-bottom: 10px;
-}}
 
 .query-box {{
   background: var(--surface);
@@ -444,7 +472,7 @@ nav {{
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  margin-top: 12px;
+  margin: 10px 0 16px;
 }}
 
 .suggestion {{
@@ -463,13 +491,6 @@ nav {{
 .suggestion:hover {{
   border-color: var(--accent-border);
   color: var(--accent);
-}}
-
-/* ── Grid ── */
-.grid {{
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 20px;
 }}
 
 /* ── Panels ── */
@@ -767,15 +788,16 @@ nav {{
 
 .foot p span {{ color: var(--accent-dim); }}
 
+/* ── Boot Log compact ── */
+.log-scroll {{ max-height: 150px; }}
+
 /* ── Responsive ── */
-@media (max-width: 900px) {{
-  .grid {{ grid-template-columns: 1fr; }}
+@media (max-width: 960px) {{
+  .layout {{ grid-template-columns: 1fr; }}
+  .top-row {{ flex-direction: column; }}
   nav {{ padding: 0 16px; }}
-  .wrap {{ padding: 20px 16px 60px; }}
+  .wrap {{ padding: 16px 16px 40px; }}
   .suggestions {{ flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }}
-  .metrics {{ flex-direction: column; gap: 1px; }}
-  .metric:first-child {{ border-radius: var(--radius) var(--radius) 0 0; }}
-  .metric:last-child {{ border-radius: 0 0 var(--radius) var(--radius); }}
 }}
 </style>
 </head>
@@ -801,38 +823,51 @@ nav {{
 
 <div class="wrap">
 
-  <div class="metrics">
-    <div class="metric">
-      <div class="metric-val" id="mTools">{tool_count}</div>
-      <div class="metric-label">Tools Registered</div>
-    </div>
-    <div class="metric">
-      <div class="metric-val" id="mSources">{tool_count}</div>
-      <div class="metric-label">Data Sources</div>
-    </div>
-    <div class="metric">
-      <div class="metric-val" id="mQueries">0</div>
-      <div class="metric-label">Queries</div>
-    </div>
-  </div>
-
-  <div class="query-section">
-    <div class="query-label">Query</div>
-    <div class="query-box">
-      <textarea id="qIn" placeholder="Ask about India's public health data..." rows="2"></textarea>
-      <div class="query-bar">
-        <span class="query-bar-hint"><kbd>Ctrl</kbd> + <kbd>Enter</kbd></span>
-        <button class="btn-submit" id="qBtn" onclick="go()">
-          <svg viewBox="0 0 12 12" fill="none"><path d="M1 6h10M7 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Query
-        </button>
+  <!-- Top bar: metrics + pipeline inline -->
+  <div class="top-row">
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-val" id="mTools">{tool_count}</div>
+        <div class="metric-label">Tools</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="mSources">{tool_count}</div>
+        <div class="metric-label">Sources</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" id="mQueries">0</div>
+        <div class="metric-label">Queries</div>
       </div>
     </div>
-    <div class="suggestions" id="suggs"></div>
+    <div class="pipeline-inline">
+      <span class="pipe-label">Pipeline</span>
+      <div class="pipeline">
+        <div class="pipe-node lit">AlloyDB</div>
+        <div class="pipe-node lit">Cartographer</div>
+        <div class="pipe-node lit">Forge</div>
+        <div class="pipe-node lit">MCP Registry</div>
+        <div class="pipe-node lit">Orchestrator</div>
+        <div class="pipe-node lit">Gemini</div>
+      </div>
+    </div>
   </div>
 
-  <div class="grid">
-    <div>
+  <!-- Main 2-col: left=query+results, right=tools+boot -->
+  <div class="layout">
+    <!-- Left column -->
+    <div class="col-main">
+      <div class="query-box">
+        <textarea id="qIn" placeholder="Ask about India's public health data..." rows="2"></textarea>
+        <div class="query-bar">
+          <span class="query-bar-hint"><kbd>Ctrl</kbd> + <kbd>Enter</kbd></span>
+          <button class="btn-submit" id="qBtn" onclick="go()">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M1 6h10M7 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Query
+          </button>
+        </div>
+      </div>
+      <div class="suggestions" id="suggs"></div>
+
       <div class="loader" id="loader">
         <div class="loader-track"></div>
         <div class="loader-label">Processing</div>
@@ -844,36 +879,21 @@ nav {{
         <div class="tags" id="tagRow"></div>
         <div class="tbl-wrap"><div class="tbl-scroll" id="tblScroll"></div></div>
       </div>
-
-      <div class="panel" style="margin-top:16px">
-        <div class="panel-head">
-          <span class="panel-title">Self-Assembly Pipeline</span>
-        </div>
-        <div class="panel-body">
-          <div class="pipeline">
-            <div class="pipe-node lit">AlloyDB</div>
-            <div class="pipe-node lit">Cartographer</div>
-            <div class="pipe-node lit">Forge</div>
-            <div class="pipe-node lit">MCP Registry</div>
-            <div class="pipe-node lit">Orchestrator</div>
-            <div class="pipe-node lit">Gemini</div>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <div>
-      <div class="panel" style="margin-bottom:12px">
+    <!-- Right column -->
+    <div class="col-side">
+      <div class="panel">
         <div class="panel-head">
           <span class="panel-title">Tool Registry</span>
-          <span class="panel-badge">{tool_count}</span>
+          <span class="panel-badge">{tool_count} active</span>
         </div>
         <div class="panel-body" id="toolList"></div>
       </div>
 
-      <div class="panel">
+      <div class="panel" style="margin-top:10px">
         <div class="panel-head">
-          <span class="panel-title">Boot Log</span>
+          <span class="panel-title">Boot Sequence</span>
           <span class="panel-badge">{"Done" if is_booted else "..."}</span>
         </div>
         <div class="panel-body">
