@@ -114,10 +114,10 @@ async def query(question: str) -> dict:
 async def _synthesize_with_gemini(question: str, tool_used: str, data: list[dict]) -> str:
     """Use Gemini 1.5 Flash to generate a natural language answer from raw data."""
     try:
-        project = os.getenv("GCP_PROJECT")
+        project = os.getenv("GOOGLE_CLOUD_PROJECT") or os.getenv("GCP_PROJECT")
         location = os.getenv("GCP_LOCATION", "us-central1")
         vertexai.init(project=project, location=location)
-        model = GenerativeModel("gemini-1.5-flash")
+        model = GenerativeModel("gemini-2.5-flash")
 
         # Truncate data for context window
         sample = data[:15]

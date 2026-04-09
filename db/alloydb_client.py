@@ -17,7 +17,7 @@ _embed_model = None
 def _get_embed_model():
     global _embed_model
     if _embed_model is None:
-        project = os.getenv("GCP_PROJECT")
+        project = os.getenv("GOOGLE_CLOUD_PROJECT") or os.getenv("GCP_PROJECT")
         location = os.getenv("GCP_LOCATION", "us-central1")
         vertexai.init(project=project, location=location)
         _embed_model = TextEmbeddingModel.from_pretrained("text-embedding-004")
